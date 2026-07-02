@@ -1,0 +1,142 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="card shadow-sm">
+    <div class="card-header bg-secondary text-white">
+        <h4 class="mb-0">⚙️ Настройка системы и справочников</h4>
+    </div>
+    <div class="card-body">
+        
+        <ul class="nav nav-tabs mb-4" id="directoryTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active fw-bold" id="status-tab" data-bs-toggle="tab" data-bs-target="#status-pane" type="button" role="tab">📌 Статусы</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link fw-bold" id="type-tab" data-bs-toggle="tab" data-bs-target="#type-pane" type="button" role="tab">📊 Типы операций</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link fw-bold" id="category-tab" data-bs-toggle="tab" data-bs-target="#category-pane" type="button" role="tab">📁 Категории</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link fw-bold" id="subcategory-tab" data-bs-toggle="tab" data-bs-target="#subcategory-pane" type="button" role="tab">📄 Подкатегории</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="directoryTabsContent">
+            
+            <div class="tab-pane fade show active" id="status-pane" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <h5>Добавить статус</h5>
+                        <form method="post" action="{% url 'add_status' %}">
+                            {% csrf_token %}
+                            {{ status_form.as_p }}
+                            <button type="submit" class="btn btn-primary w-100">Сохранить</button>
+                        </form>
+                    </div>
+                    <div class="col-md-8">
+                        <h5>Текущие статусы</h5>
+                        <ul class="list-group">
+                            {% for status in statuses %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ status.name }}
+                                <a href="{% url 'delete_directory_item' 'status' status.id %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Удалить этот статус?');">Удалить</a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="type-pane" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <h5>Добавить тип</h5>
+                        <form method="post" action="{% url 'add_type' %}">
+                            {% csrf_token %}
+                            {{ type_form.as_p }}
+                            <button type="submit" class="btn btn-primary w-100">Сохранить</button>
+                        </form>
+                    </div>
+                    <div class="col-md-8">
+                        <h5>Текущие типы</h5>
+                        <ul class="list-group">
+                            {% for t in types %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ t.name }}
+                                <a href="{% url 'delete_directory_item' 'type' t.id %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Удалить этот тип?');">Удалить</a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="category-pane" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <h5>Добавить категорию</h5>
+                        <form method="post" action="{% url 'add_category' %}">
+                            {% csrf_token %}
+                            {{ category_form.as_p }}
+                            <button type="submit" class="btn btn-primary w-100">Сохранить</button>
+                        </form>
+                    </div>
+                    <div class="col-md-8">
+                        <h5>Текущие категории</h5>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr><th>Название</th><th>Относится к типу</th><th>Действие</th></tr>
+                            </thead>
+                            <tbody>
+                                {% for category in categories %}
+                                <tr>
+                                    <td>{{ category.name }}</td>
+                                    <td><span class="badge bg-secondary">{{ category.income_expense_type.name }}</span></td>
+                                    <td>
+                                        <a href="{% url 'delete_directory_item' 'category' category.id %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Удалить категорию? Все её подкатегории тоже удалятся!');">Удалить</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="subcategory-pane" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <h5>Добавить подкатегорию</h5>
+                        <form method="post" action="{% url 'add_subcategory' %}">
+                            {% csrf_token %}
+                            {{ subcategory_form.as_p }}
+                            <button type="submit" class="btn btn-primary w-100">Сохранить</button>
+                        </form>
+                    </div>
+                    <div class="col-md-8">
+                        <h5>Текущие подкатегории</h5>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr><th>Подкатегория</th><th>Родительская категория</th><th>Действие</th></tr>
+                            </thead>
+                            <tbody>
+                                {% for sub in subcategories %}
+                                <tr>
+                                    <td>{{ sub.name }}</td>
+                                    <td>{{ sub.category.name }} <small class="text-muted">({{ sub.category.income_expense_type.name }})</small></td>
+                                    <td>
+                                        <a href="{% url 'delete_directory_item' 'subcategory' sub.id %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Удалить подкатегорию?');">Удалить</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
