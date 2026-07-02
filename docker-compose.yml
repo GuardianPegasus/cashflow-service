@@ -26,6 +26,9 @@ services:
       - DB_PASSWORD=cashflow_password
       - DB_HOST=db
       - DB_PORT=5432
+      - DJANGO_SECRET_KEY=prod-super-secure-key-here-1234567890
+      - DJANGO_DEBUG=True
+      - DJANGO_ALLOWED_HOSTS=127.0.0.1 localhost web
     depends_on:
       - db
 

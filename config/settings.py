@@ -20,13 +20,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-%#1ptm)+6x#1cfq(o+!(7$xcxa4os!0eu7-u&whu81msr-687+'
+# SECRET_KEY = 'django-insecure-%#1ptm)+6x#1cfq(o+!(7$xcxa4os!0eu7-u&whu81msr-687+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = False
 
-ALLOWED_HOSTS = []
+import os
 
+# Считываем ключ из env, если его там нет, то берем дефолтный отладочный
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-fallback-dev-key')
+
+# Если переменная DJANGO_DEBUG равна 'False' — выключаем дебаг
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
+
+# Хосты, которым разрешено обрабатывать запросы
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '127.0.0.1 localhost').split()
 
 # Application definition
 
